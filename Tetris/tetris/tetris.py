@@ -41,7 +41,7 @@ def check_for_collision(board, shape, x_coord, y_coord):
 def find_y_coord(board, shape, x_coord):
     y_coord = None
 
-    # work from top to bottom on the board until a collision is detected.
+    # work from top to top on the board until a collision is detected.
     # once one is detected the last valid Y coord is where it should be put
     for row in range(len(board)):
         if check_for_collision(board, shape, x_coord, row):
@@ -108,11 +108,16 @@ def initialize_board():
 def read_in_moves_file(file_name):
     ##pretty simple.. read in the input file
     move_list = []
-    with open(file_name, 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            move_list.append(line.rstrip().split(","))
-        f.close()
+    try:
+        with open(file_name, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                move_list.append(line.rstrip().split(","))
+            f.close()
+    except Exception as e:
+        print("Error reading file "+e)
+        sys.exit()
+
     return move_list
 
 
@@ -124,7 +129,7 @@ def print_board(board):
     print("\n")
 
 
-def find_max_height(board):
+def find_height(board):
     height = 0
     # start at the bottom of the board and count up
     for row in reversed(board):
@@ -152,8 +157,9 @@ def play_game(move_line):
         ##now we have the block to drop and where to drop it in
         drop(board, block, x_coord)
 
-    print(find_max_height(board))
-
+    height = find_height(board)
+    print(height)
+    return height
 
 def main():
     file_name = sys.argv[1]
