@@ -162,7 +162,15 @@ def play_game(move_line):
     return height
 
 def main():
-    file_name = sys.argv[1]
+
+
+    file_name = None
+    if len(sys.argv) < 2:
+        print("No game file passed in.  To run ./tetris PATH_TO_GAME_FILE")
+        sys.exit()
+    else:
+        file_name = sys.argv[1]
+
     move_list = read_in_moves_file(file_name)
     for move_line in move_list:
         play_game(move_line)
