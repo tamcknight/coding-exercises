@@ -62,12 +62,11 @@ public class Trade {
 
     @Override
     public String toString() {
-        return "Trade{" +
-                "action='" + action + '\'' +
-                ", quantity=" + quantity +
+        return "Trade:" +
+                ", qty=" + quantity +
                 ", price=" + price +
-                ", tradeID='" + tradeID + '\'' +
-                '}';
+                ", tradeID=" + tradeID +
+                " ---> "+quantity+"@"+price;
     }
 
     public static class TradeBuilder {

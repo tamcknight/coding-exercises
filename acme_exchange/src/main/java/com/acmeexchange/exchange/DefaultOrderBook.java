@@ -285,8 +285,8 @@ public class DefaultOrderBook implements OrderBook {
                     askOrder.setQuantity(askOrder.getQuantity() - tradeQty);
                     anOrder.setQuantity(anOrder.getQuantity() - tradeQty);
                     //per the spec print out the trade
-                    System.out.println(trade.toString());
 
+                    System.out.println(trade.toString());
                     //if order in the book has been fully filled it needs to
                     //be removed from the book.
                     removeFullyFilledOrder(ask, askOrder);
@@ -495,7 +495,7 @@ public class DefaultOrderBook implements OrderBook {
 
             mid = (bestAsk + bestBid) / 2;
         } else {
-            log.error("The market is currently one sided or empty.  No Mid Exists.");
+            log.info("The market is currently one sided or empty.  No Mid Exists.");
             //per the spec return a Nan is the market is one sided.
             mid = Double.NaN;
         }

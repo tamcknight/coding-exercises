@@ -1,4 +1,4 @@
-package com.acmebank.objects;
+package com.acmebank.tests;
 
 import com.acmeexchange.exceptions.DuplicateOrderException;
 import com.acmeexchange.exceptions.InvalidOrderPriceException;
