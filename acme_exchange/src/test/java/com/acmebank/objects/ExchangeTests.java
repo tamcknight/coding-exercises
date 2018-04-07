@@ -10,8 +10,10 @@ import com.acmeexchange.records.TradeLog;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.List;
 
+import static com.acmeexchange.exchange.DefaultOrderBook.readInOrderFile;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class ExchangeTests {
@@ -20,8 +22,12 @@ public class ExchangeTests {
 
     @Test
     public void testMidQuote() {
+
+        List<String> list = readInOrderFile("src/test/resources/midOf1500.txt");
+
         try {
-            OrderBook book = DefaultOrderBook.createOrderBookFromFile("src/test/resources/midOf1500.txt");
+            OrderBook book = new DefaultOrderBook("ACME");
+            list.forEach(order -> book.processOrderFromString(order));
             assertThat(book.getMidQuote()).isEqualTo(1500.0);
         } catch (Exception e) {
             log.error(e);
@@ -30,8 +36,12 @@ public class ExchangeTests {
 
     @Test
     public void testBuys() {
+
+        List<String> list = readInOrderFile("src/test/resources/testBuyMatch.txt");
+
         try {
-            DefaultOrderBook book = DefaultOrderBook.createOrderBookFromFile("src/test/resources/testBuyMatch.txt");
+            OrderBook book = new DefaultOrderBook("ACME");
+            list.forEach(order -> book.processOrderFromString(order));
             TradeLog log = book.getTradeLog();
             assertThat(log.getTradeLog().get(0).getQuantity()).isEqualTo(5);
             assertThat(log.getTradeLog().get(1).getQuantity()).isEqualTo(4);
@@ -42,8 +52,12 @@ public class ExchangeTests {
 
     @Test
     public void testSells() {
+
+        List<String> list = readInOrderFile("src/test/resources/testSellMatch.txt");
+
         try {
-            DefaultOrderBook book = DefaultOrderBook.createOrderBookFromFile("src/test/resources/testSellMatch.txt");
+            OrderBook book = new DefaultOrderBook("ACME");
+            list.forEach(order -> book.processOrderFromString(order));
             TradeLog log = book.getTradeLog();
             assertThat(log.getTradeLog().get(0).getQuantity()).isEqualTo(4);
             assertThat(log.getTradeLog().get(1).getQuantity()).isEqualTo(4);
@@ -54,8 +68,13 @@ public class ExchangeTests {
 
     @Test
     public void testUpdatedOrder() {
+
+        List<String> list = readInOrderFile("src/test/resources/testSellMatchUpdate.txt");
+
         try {
-            DefaultOrderBook book = DefaultOrderBook.createOrderBookFromFile("src/test/resources/testSellMatchUpdate.txt");
+            OrderBook book = new DefaultOrderBook("ACME");
+            list.forEach(order -> book.processOrderFromString(order));
+
             TradeLog log = book.getTradeLog();
             assertThat(log.getTradeLog().get(0).getQuantity()).isEqualTo(4);
             assertThat(log.getTradeLog().get(1).getQuantity()).isEqualTo(4);
@@ -68,8 +87,11 @@ public class ExchangeTests {
     @Test
     public void testDuplicateOrderId() {
 
+        List<String> list = readInOrderFile("src/test/resources/orderswithDupes.txt");
+
         try {
-            OrderBook book = DefaultOrderBook.createOrderBookFromFile("src/test/resources/orderswithDupes.txt");
+            OrderBook book = new DefaultOrderBook("ACME");
+            list.forEach(order -> book.processOrderFromString(order));
         } catch (Exception e) {
             assertThat(e).isInstanceOf(DuplicateOrderException.class);
             log.error(e);
@@ -79,8 +101,11 @@ public class ExchangeTests {
     @Test
     public void testBadOrderPrice() {
 
+        List<String> list = readInOrderFile("src/test/resources/badprice.txt");
+
         try {
-            OrderBook book = DefaultOrderBook.createOrderBookFromFile("src/test/resources/badprice.txt");
+            OrderBook book = new DefaultOrderBook("ACME");
+            list.forEach(order -> book.processOrderFromString(order));
         } catch (Exception e) {
             assertThat(e).isInstanceOf(InvalidOrderPriceException.class);
             log.error(e);
@@ -90,8 +115,11 @@ public class ExchangeTests {
     @Test
     public void testBadOrderQty() {
 
+        List<String> list = readInOrderFile("src/test/resources/badqty.txt");
+
         try {
-            OrderBook book = DefaultOrderBook.createOrderBookFromFile("src/test/resources/badqty.txt");
+            OrderBook book = new DefaultOrderBook("ACME");
+            list.forEach(order -> book.processOrderFromString(order));
         } catch (Exception e) {
             assertThat(e).isInstanceOf(InvalidOrderQuantityException.class);
             log.error(e);
@@ -101,8 +129,10 @@ public class ExchangeTests {
     @Test
     public void testRemovesWithNoOrder() {
 
+        List<String> list = readInOrderFile("src/test/resources/removesNoOrder.txt");
         try {
-            OrderBook book = DefaultOrderBook.createOrderBookFromFile("src/test/resources/removesNoOrder.txt");
+            OrderBook book = new DefaultOrderBook("ACME");
+            list.forEach(order -> book.processOrderFromString(order));
         } catch (Exception e) {
             assertThat(e).isInstanceOf(Exception.class);
             log.error(e);
@@ -112,8 +142,11 @@ public class ExchangeTests {
     @Test
     public void testOriginalCase() {
 
+        List<String> list = readInOrderFile("src/test/resources/originalCase.txt");
+
         try {
-            OrderBook book = DefaultOrderBook.createOrderBookFromFile("src/test/resources/originalCase.txt");
+            OrderBook book = new DefaultOrderBook("ACME");
+            list.forEach(order -> book.processOrderFromString(order));
         } catch (Exception e) {
             assertThat(e).isInstanceOf(InvalidOrderQuantityException.class);
             log.error(e);
@@ -123,8 +156,12 @@ public class ExchangeTests {
     @Test
     public void testBadSide() {
 
+        List<String> list = readInOrderFile("src/test/resources/badside.txt");
+
         try {
-            OrderBook book = DefaultOrderBook.createOrderBookFromFile("src/test/resources/badside.txt");
+            OrderBook book = new DefaultOrderBook("ACME");
+            list.forEach(order -> book.processOrderFromString(order));
+
         } catch (Exception e) {
             assertThat(e).isInstanceOf(InvalidOrderSideException.class);
             log.error(e);
@@ -134,10 +171,13 @@ public class ExchangeTests {
     @Test
     public void testBadAction() {
 
+        List<String> list = readInOrderFile("src/test/resources/badaction.txt");
+
         try {
-            OrderBook book = DefaultOrderBook.createOrderBookFromFile("src/test/resources/badaction.txt");
+            OrderBook book = new DefaultOrderBook("ACME");
+            list.forEach(order -> book.processOrderFromString(order));
         } catch (Exception e) {
-            assertThat(e).isInstanceOf(InvalidOrderSideException.class);
+            assertThat(e).isInstanceOf(IllegalArgumentException.class);
             log.error(e);
         }
     }

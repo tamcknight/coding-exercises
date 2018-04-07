@@ -39,11 +39,34 @@ public class DefaultOrderBook implements OrderBook {
     public static void main(String[] args) {
 
         try {
-            DefaultOrderBook book = DefaultOrderBook.createOrderBookFromFile("args[0]");
+            OrderBook book = new DefaultOrderBook("ACME");
+            List<String> list = readInOrderFile(args[0]);
+            list.forEach(order -> book.processOrderFromString(order));
+        } catch (ArrayIndexOutOfBoundsException ioe){
+            log.error("No file passed on command line.",ioe);
+
         } catch (Exception e) {
             log.error("Error running DefaultOrderBook", e);
         }
     }
+
+    @Override
+    public void processOrderFromString(String orderString) {
+
+        try {
+            Order order = createOrderFromString(orderString);
+            process(order);
+
+        } catch (Exception e) {
+            log.warn(e);
+        }
+    }
+
+    /**
+     * Entry point for all orders to be processed.
+     *
+     * @param anOrder
+     */
 
     @Override
     public void process(Order anOrder) {
@@ -74,9 +97,16 @@ public class DefaultOrderBook implements OrderBook {
         }
     }
 
+    /**
+     * Processes order add messages.
+     *
+     * @param addedOrder
+     * @throws DuplicateOrderException
+     */
     @Override
     public void processOrderAdd(Order addedOrder) throws DuplicateOrderException {
 
+        //ensure that the order add message is not a dupe.
         if (orderMap.containsKey(addedOrder.getOrderId())) {
             log.warn(addedOrder.getOrderId() + " order id is a duplicate.");
             throw new DuplicateOrderException("Order Id has already been added");
@@ -90,10 +120,12 @@ public class DefaultOrderBook implements OrderBook {
                 //add it to the map of orders to track them
                 orderMap.put(addedOrder.getOrderId(), addedOrder);
 
-                //add a reference to the depth of the book
+                //add a reference to the depth of the book if the market exists at that price
                 if (marketSide.containsKey(addedOrder.getPrice())) {
                     marketSide.get(addedOrder.getPrice()).add(addedOrder);
                 } else {
+                    //if not market exists at the prices create the market at the price and
+                    //add the order to the market depth for that price
                     List<Order> depth = new ArrayList<Order>();
                     depth.add(addedOrder);
                     marketSide.put(addedOrder.getPrice(), depth);
@@ -103,13 +135,21 @@ public class DefaultOrderBook implements OrderBook {
 
     }
 
+    /**
+     * Processes the order update
+     *
+     * @param updatedOrder
+     * @return
+     */
     @Override
     public Order processOrderUpate(Order updatedOrder) {
 
+        //update the in memory order
         Order oldOrder = null;
         if (orderMap.containsKey(updatedOrder.getOrderId())) {
             oldOrder = orderMap.put(updatedOrder.getOrderId(), updatedOrder);
         }
+        //after the order is updated see if it can be matched up in the market
         match(updatedOrder);
 
         return oldOrder;
@@ -117,6 +157,7 @@ public class DefaultOrderBook implements OrderBook {
 
     /**
      * Processes a Order Cancel message.
+     *
      * @param removedOrder
      * @return
      */
@@ -165,6 +206,7 @@ public class DefaultOrderBook implements OrderBook {
      * It determines what side of the order book an order should go in basd on side
      * if an order is not matched off.
      * a
+     *
      * @param anOrder
      * @return
      */
@@ -185,6 +227,7 @@ public class DefaultOrderBook implements OrderBook {
     /**
      * When an order comes in this is called to see if the trade can be matched off
      * with the current order book.
+     *
      * @param anOrder
      */
     @Override
@@ -258,6 +301,7 @@ public class DefaultOrderBook implements OrderBook {
 
     /**
      * This method will try to match a sell order up with any buys.
+     *
      * @param anOrder
      */
     public void matchSellOrder(Order anOrder) {
@@ -318,6 +362,7 @@ public class DefaultOrderBook implements OrderBook {
     /**
      * If an order is fully filled it needs to be removed from the market.  This important
      * for maintaining the data structure
+     *
      * @param bidOrAsk
      * @param anOrder
      */
@@ -342,9 +387,10 @@ public class DefaultOrderBook implements OrderBook {
 
     /**
      * Take a string comma delimited string and creates and order from it.
-     *
+     * <p>
      * Format is Action, OrderID, Side, Qty, Price
      * Example: A,100000,S,10,1000
+     *
      * @param orderString
      * @return
      */
@@ -399,16 +445,6 @@ public class DefaultOrderBook implements OrderBook {
 
     }
 
-    public static DefaultOrderBook createOrderBookFromFile(String filePath) {
-
-        DefaultOrderBook book = new DefaultOrderBook("ACME");
-        try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
-            stream.forEach(line -> book.process(DefaultOrderBook.createOrderFromString(line)));
-        } catch (Exception e) {
-            log.error("Error reading in file", e);
-        }
-        return book;
-    }
 
     /**
      * Ths method prints out the order book with the Asks descending from greatest to smallest and
@@ -446,6 +482,7 @@ public class DefaultOrderBook implements OrderBook {
 
     /**
      * The calcuates the mid of the market which is the greatest buy price and smallest sell price.
+     *
      * @return
      */
     @Override
@@ -469,11 +506,30 @@ public class DefaultOrderBook implements OrderBook {
 
     /**
      * Increment the trade id when a trade is made.
+     *
      * @return
      */
     //although this process is not multhreaded if it was changed to be this would need to ensure thread safety
     private synchronized int incrementAndGetTradeId() {
         return tradeId++;
+    }
+
+
+    /**
+     * Reads in a file and create list of the Strings that represent orders.
+     *
+     * @param filePath
+     * @return
+     */
+    public static List<String> readInOrderFile(String filePath) {
+
+        List<String> list = new ArrayList<>();
+        try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
+            stream.forEach(line -> list.add(line));
+        } catch (Exception e) {
+            log.error("Error processing file", e);
+        }
+        return list;
     }
 
     public TradeLog getTradeLog() {
