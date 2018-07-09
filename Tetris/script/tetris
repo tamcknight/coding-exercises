@@ -1,4 +1,0 @@
-#!/bin/sh
-
-cd ../tetris
-python tetris.py $1
