@@ -16,7 +16,7 @@ shinyUI(fluidPage(
       h6("Use the slider to select the years by which you would like to forecast to work from.  The 
          graph will take the input and recalcuate the forecast based on the date range selected.  The
          data will be forecasted out 12 months using the forecast library.  It will use the best model
-         available to fit to the line.  The forecast is in blue. Expand the years to see more trend."),
+         available to fit to the data  The forecast is in blue. Expand the years to see more trend."),
       plotOutput("plot1")
     )
   )
