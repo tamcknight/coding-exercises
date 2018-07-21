@@ -1,6 +1,6 @@
 library(shiny)
 shinyUI(fluidPage(
-  titlePanel("Plot Random Numbers"),
+  titlePanel("Mauna Loa Atmospheric CO2 Concentration"),
   sidebarLayout(
     sidebarPanel(
      
