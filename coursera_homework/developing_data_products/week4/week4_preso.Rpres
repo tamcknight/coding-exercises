@@ -32,7 +32,7 @@ Being able to predict CO2 levels will give better insight into future weather pa
 CO2 Concentration Predictor
 ========================================================
 
-Here is a [link](www.rstudio.com) to the interactive Shiny application
+Here is a [link](https://tamcknight.shinyapps.io/week_4/) to the interactive Shiny application. It allows you to predict the next 12 months of CO2 and to test out different time periods.
 
 ```{r}
 library(forecast)
@@ -48,6 +48,13 @@ library(forecast)
 Benefits of the Application
 ========================================================
 
-- Ability to understand future temperature increases
+Being able to predict CO2 levels is highly benefitcial which is why people should use this app.
+
+- Ability to understand future temperature increases the ability to react
+- Prove to people that CO2 levels will continue to increase without change
+- The app is cool
+- It is free and [open source](https://github.com/tamcknight/coding-exercises/tree/master/coursera_homework/developing_data_products/week_4)
+
+
 
 
