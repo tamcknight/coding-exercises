@@ -1,0 +1,64 @@
+---
+title: "Mauna Loa Atmospheric CO2 Concentration"
+author: "Tim McKnight"
+date: "7/21/2018"
+output: ioslides_presentation
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Dangers of rising CO2
+
+CO2 levels have been continuosly rising since the industrial revolution due mostly to the buring of fossil fuels.  Whenever the amount of CO2 in the atmosphere has gone up, the temperature of Earth has also gone up. When the temperature goes up, the CO2 in the atmosphere goes up even more.
+
+- CO2 in the atmosphere works to trap heat close to Earth
+- Excess carbon in the atmosphere warms the planet and helps plants on land grow more. 
+- Excess carbon in the ocean makes the water more acidic, putting marine life in danger
+- Heat trapped from excess CO2 melts glaciers and causes the Earth'd temperature to rise
+
+
+## Predicting CO2 Levels
+
+Being able to predict CO2 levels will give better insight into future weather patterns. 
+
+- Knowing what future levels will be at will allow humans to react sooner to prevent overheating
+- CO2 levels are cyclical and predictable
+- Mauna Loa Atmospheric CO2 Concentration data going back to 1959 allows for accurate predictions
+- Using the forecast library in R we can predict future CO2 levels
+
+## CO2 Concentration Predictor
+
+```{r co2}
+library(forecast)
+library(shiny)
+
+inputPanel(
+  
+      sliderInput("years", "Select the range of years to plot", sep="",
+                  1959, 1997, value = c(1994, 1997)),
+      checkboxInput("show_xlab", "Show/Hide X Axis Label", value = TRUE),
+      checkboxInput("show_ylab", "Show/Hide Y Axis Label", value = TRUE)
+)
+    
+
+renderPlot({
+    minYear <- input$years[1]
+    maxYear <- input$years[2]
+
+    data.subset <- window(co2,start = c(minYear,1), end = c(maxYear,12))
+    xlab <- ifelse(input$show_xlab, "Year", "")
+    ylab <- ifelse(input$show_ylab, "CO2 Concentration", "")
+    plot(forecast(data.subset, 12), xlab = xlab, ylab = ylab, type = 'l')
+    
+})
+
+```
+
+## Benefits of the Application
+
+- Ability to understand future temperature increases
+
+
